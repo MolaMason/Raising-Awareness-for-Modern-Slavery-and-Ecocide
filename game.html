@@ -35,114 +35,133 @@
       justify-content: center;
       align-items: center;
       font-weight: bold;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       border-radius: 8px;
       color: #2e4d2c;
       text-align: center;
       padding: 5px;
+      box-sizing: border-box;
     }
   </style>
 </head>
 <body>
   <h1>Word Merge Game</h1>
-  <p>Use arrow keys to merge similar words and discover new ones.</p>
+  <p>Use arrow keys to combine words in the supply chain.</p>
   <div id="game-board"></div>
 
   <script>
-    const vocabProgression = [
-      "Enslavement",
-      "Extraction",
-      "Export",
-      "Manufacture",
-      "Retail"
-    ];
-
+    const vocab = ["Enslavement", "Extraction", "Export", "Manufacture", "Retail"];
     const size = 4;
-    const board = new Array(size * size).fill(null);
+    let board = Array.from({ length: size }, () => Array(size).fill(null));
     const gameBoard = document.getElementById("game-board");
 
-    function createTiles() {
-      for (let i = 0; i < size * size; i++) {
-        const tile = document.createElement("div");
-        tile.classList.add("tile");
-        tile.dataset.index = i;
-        gameBoard.appendChild(tile);
+    function initBoard() {
+      gameBoard.innerHTML = '';
+      for (let row = 0; row < size; row++) {
+        for (let col = 0; col < size; col++) {
+          const tile = document.createElement("div");
+          tile.classList.add("tile");
+          tile.dataset.row = row;
+          tile.dataset.col = col;
+          gameBoard.appendChild(tile);
+        }
       }
     }
 
     function addRandomTile() {
-      const empty = board.map((val, i) => val === null ? i : null).filter(i => i !== null);
-      if (empty.length === 0) return;
-      const index = empty[Math.floor(Math.random() * empty.length)];
-      board[index] = 0;
-    }
-
-    function renderBoard() {
-      for (let i = 0; i < board.length; i++) {
-        const tile = gameBoard.children[i];
-        const val = board[i];
-        tile.textContent = val !== null ? vocabProgression[val] : "";
-        tile.style.backgroundColor = val !== null ? `hsl(${(val + 2) * 40}, 40%, 80%)` : "#d6e4d6";
-      }
-    }
-
-    function slide(row) {
-      let arr = row.filter(x => x !== null);
-      for (let i = 0; i < arr.length - 1; i++) {
-        if (arr[i] === arr[i + 1] && arr[i] < vocabProgression.length - 1) {
-          arr[i]++;
-          arr.splice(i + 1, 1);
+      const empty = [];
+      for (let row = 0; row < size; row++) {
+        for (let col = 0; col < size; col++) {
+          if (board[row][col] === null) empty.push({ row, col });
         }
       }
-      while (arr.length < size) arr.push(null);
-      return arr;
+      if (empty.length === 0) return;
+      const { row, col } = empty[Math.floor(Math.random() * empty.length)];
+      board[row][col] = 0; // Start with the lowest vocab level
     }
 
-    function rotate(times) {
-      for (let t = 0; t < times; t++) {
-        const newBoard = [];
-        for (let i = 0; i < size; i++) {
-          for (let j = 0; j < size; j++) {
-            newBoard[j * size + (size - 1 - i)] = board[i * size + j];
+    function updateBoard() {
+      for (let row = 0; row < size; row++) {
+        for (let col = 0; col < size; col++) {
+          const tile = document.querySelector(`.tile[data-row='${row}'][data-col='${col}']`);
+          const val = board[row][col];
+          if (val !== null) {
+            tile.textContent = vocab[val];
+            tile.style.backgroundColor = `hsl(${(val + 2) * 40}, 60%, 80%)`;
+          } else {
+            tile.textContent = "";
+            tile.style.backgroundColor = "#d6e4d6";
           }
         }
-        for (let i = 0; i < board.length; i++) board[i] = newBoard[i];
       }
+    }
+
+    function slideAndMerge(line) {
+      const newLine = line.filter(x => x !== null);
+      for (let i = 0; i < newLine.length - 1; i++) {
+        if (newLine[i] === newLine[i + 1] && newLine[i] < vocab.length - 1) {
+          newLine[i]++;
+          newLine.splice(i + 1, 1);
+        }
+      }
+      while (newLine.length < size) {
+        newLine.push(null);
+      }
+      return newLine;
+    }
+
+    function transpose(matrix) {
+      return matrix[0].map((_, colIndex) => matrix.map(row => row[colIndex]));
+    }
+
+    function reverseRows(matrix) {
+      return matrix.map(row => row.slice().reverse());
     }
 
     function move(direction) {
-      const rotations = { ArrowUp: 0, ArrowRight: 1, ArrowDown: 2, ArrowLeft: 3 };
-      const rot = rotations[direction];
       let moved = false;
+      let oldBoard = board.map(row => row.slice());
 
-      rotate(rot);
-      for (let i = 0; i < size; i++) {
-        const row = board.slice(i * size, i * size + size);
-        const newRow = slide(row);
-        for (let j = 0; j < size; j++) {
-          if (board[i * size + j] !== newRow[j]) moved = true;
-          board[i * size + j] = newRow[j];
+      if (direction === "ArrowLeft") {
+        board = board.map(row => slideAndMerge(row));
+      } else if (direction === "ArrowRight") {
+        board = board.map(row => slideAndMerge(row.slice().reverse()).reverse());
+      } else if (direction === "ArrowUp") {
+        board = transpose(board);
+        board = board.map(row => slideAndMerge(row));
+        board = transpose(board);
+      } else if (direction === "ArrowDown") {
+        board = transpose(board);
+        board = board.map(row => slideAndMerge(row.slice().reverse()).reverse());
+        board = transpose(board);
+      }
+
+      for (let r = 0; r < size; r++) {
+        for (let c = 0; c < size; c++) {
+          if (board[r][c] !== oldBoard[r][c]) {
+            moved = true;
+          }
         }
       }
-      rotate((4 - rot) % 4);
 
       if (moved) {
         addRandomTile();
-        renderBoard();
+        updateBoard();
       }
     }
 
     window.addEventListener("keydown", (e) => {
-      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+      if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key)) {
         e.preventDefault();
         move(e.key);
       }
     });
 
-    createTiles();
+    // Start game
+    initBoard();
     addRandomTile();
     addRandomTile();
-    renderBoard();
+    updateBoard();
   </script>
 </body>
 </html>
