@@ -1,42 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />    
-    <title>Raising Awareness for Modern Slavery and Ecocide</title>
-    <style>
-        body {
-        margin: 0;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background-color: #f4f8f4;
-        color: #3b6638;
-        }
-        
-      header {
-      	background-color: #4a7c59;
-        color: #fff;
-        padding: 2rem;
-        text-align: center; 
-       }
-       
-       nav {
-       	background-color: #739e82;
-        padding: 1rem;
-        display: flex;
-        justify-content: center;
-        gap: 2rem;
-       }
-       
-       nav a {
-       	color: #fff;
-        text-decoration: none;
-        font-weight: bold;
-       }
-        
-       main {
-        padding: 2rem;
-       }
-        section {
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Raising Awareness for Modern Slavery and Ecocide</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f8f4;
+      color: #3b6638;
+    }
+
+    header {
+      background-color: #4a7c59;
+      color: #fff;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    nav {
+      background-color: #739e82;
+      padding: 1rem;
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+    }
+
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    main {
+      padding: 2rem;
+    }
+
+    section {
       margin-bottom: 3rem;
     }
 
@@ -49,7 +50,8 @@
 
     iframe {
       width: 100%;
-      height: 300px;
+      height: 500px;
+      border: none;
     }
 
     footer {
@@ -58,7 +60,6 @@
       text-align: center;
       padding: 1rem;
     }
-    
   </style>
 </head>
 <body>
@@ -79,7 +80,6 @@
       <div class="song">
         <h3>Song Title</h3>
         <p>Lyrics or embedded audio goes here...</p>
-        <!-- Embed audio or link -->
       </div>
     </section>
 
@@ -93,7 +93,7 @@
 
     <section id="game">
       <h2>Word Merge</h2>
-      <p>Instructions</p>
+      <p>Use arrow keys to merge similar words and discover the supply chain process.</p>
       <iframe src="game.html" title="Word Merge Game"></iframe>
     </section>
   </main>
@@ -103,142 +103,3 @@
   </footer>
 </body>
 </html>
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Word Merge Game</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f0f8f0;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 2rem;
-    }
-
-    h1 {
-      color: #4a7c59;
-    }
-
-    #game-board {
-      display: grid;
-      grid-template-columns: repeat(4, 100px);
-      grid-template-rows: repeat(4, 100px);
-      gap: 10px;
-      margin-top: 20px;
-    }
-
-    .tile {
-      width: 100px;
-      height: 100px;
-      background-color: #d6e4d6;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-weight: bold;
-      font-size: 0.9rem;
-      border-radius: 8px;
-      color: #2e4d2c;
-    }
-  </style>
-</head>
-<body>
-  <h1>Word Merge Game</h1>
-  <p>Use arrow keys to merge similar words and discover new ones.</p>
-  <div id="game-board"></div>
-
-  <script>
-    const vocabProgression = [
-      "Enslavement", 
-      "Extraction",  
-      "Export",  
-      "Manufacture",  
-      "Retail",  
-    ];
-
-    const board = [];
-    const size = 4;
-    const gameBoard = document.getElementById("game-board");
-
-    function initBoard() {
-      for (let i = 0; i < size * size; i++) {
-        board[i] = null;
-        const tile = document.createElement("div");
-        tile.classList.add("tile");
-        tile.setAttribute("data-index", i);
-        gameBoard.appendChild(tile);
-      }
-      addRandomTile();
-      addRandomTile();
-      render();
-    }
-
-    function addRandomTile() {
-      const empty = board.map((v, i) => v === null ? i : null).filter(v => v !== null);
-      if (empty.length === 0) return;
-      const index = empty[Math.floor(Math.random() * empty.length)];
-      board[index] = 0; // Level 0 in vocab
-    }
-
-    function render() {
-      board.forEach((val, i) => {
-        const tile = gameBoard.children[i];
-        tile.textContent = val !== null ? vocabProgression[val] : "";
-        tile.style.backgroundColor = val !== null ? `hsl(${(val + 2) * 40}, 40%, 80%)` : "#d6e4d6";
-      });
-    }
-
-    function slide(row) {
-      let arr = row.filter(x => x !== null);
-      for (let i = 0; i < arr.length - 1; i++) {
-        if (arr[i] === arr[i + 1] && arr[i] < vocabProgression.length - 1) {
-          arr[i]++;
-          arr.splice(i + 1, 1);
-        }
-      }
-      while (arr.length < size) arr.push(null);
-      return arr;
-    }
-
-    function rotateBoard(times) {
-      for (let t = 0; t < times; t++) {
-        const newBoard = [];
-        for (let i = 0; i < size; i++) {
-          for (let j = 0; j < size; j++) {
-            newBoard[j * size + (size - 1 - i)] = board[i * size + j];
-          }
-        }
-        board.splice(0, board.length, ...newBoard);
-      }
-    }
-
-    function move(direction) {
-      let moved = false;
-      const rotations = { ArrowUp: 0, ArrowRight: 1, ArrowDown: 2, ArrowLeft: 3 }[direction];
-      rotateBoard(rotations);
-      for (let i = 0; i < size; i++) {
-        const row = board.slice(i * size, i * size + size);
-        const newRow = slide(row);
-        for (let j = 0; j < size; j++) {
-          if (board[i * size + j] !== newRow[j]) moved = true;
-          board[i * size + j] = newRow[j];
-        }
-      }
-      rotateBoard((4 - rotations) % 4);
-      if (moved) addRandomTile();
-      render();
-    }
-
-    window.addEventListener("keydown", (e) => {
-      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
-        e.preventDefault();
-        move(e.key);
-      }
-    });
-
-    initBoard();
-  </script>
-</body>
